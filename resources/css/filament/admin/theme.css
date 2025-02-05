@@ -1,0 +1,25 @@
+@import '/vendor/filament/filament/resources/css/theme.css';
+@import '/vendor/awcodes/filament-tiptap-editor/resources/css/plugin.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@config 'tailwind.config.js';
+
+.fi-sidebar {
+    @apply shadow-md !important;
+    background: #fff !important;
+}
+
+/* .fi-sidebar-item {
+    .fi-sidebar-item-label {
+        color: #fff;
+    }
+}
+
+.fi-sidebar-item-active {
+    .fi-sidebar-item-label {
+        @apply text-cyan-500;
+    }
+} */

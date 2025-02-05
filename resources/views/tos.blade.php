@@ -1,0 +1,1 @@
+<a href="{{ config('app.tos_url') }}" target="_blank" class="font-medium text-cyan-600 dark:text-cyan-500 hover:underline">Politique de confidentialité</a>

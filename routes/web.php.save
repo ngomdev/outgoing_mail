@@ -1,0 +1,125 @@
+<?php
+
+use App\Models\Team;
+use App\Models\User;
+use App\Enums\RoleEnum;
+use App\Models\Courier;
+use App\Enums\DocStatus;
+use App\Models\Document;
+use App\Enums\DocUrgency;
+use App\Models\CustomRole;
+use App\Models\CourierUser;
+use App\Models\DocTemplate;
+use Illuminate\Support\Facades\Route;
+use App\Filament\Pages\PasswordExpired;
+use App\Notifications\CourierDelivered;
+use App\Services\DocumentNumberService;
+use App\Notifications\DocumentValidated;
+use App\Services\DocManipulationService;
+use PhpOffice\PhpWord\TemplateProcessor;
+use App\Http\Middleware\PasswordNotExpired;
+use App\Jobs\SendInformativeNotificationJob;
+use Illuminate\Support\Facades\Notification;
+use App\Http\Controllers\DocumentTemplateController;
+use App\Notifications\SendDocInformativeNotification;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+
+Route::get('preview-doc', function () {
+    return view('preview-doc');
+});
+
+Route::get('/test', function () {
+
+    $docPath = public_path('storage/doc-t/memorandum-template.docx');
+    $fileName = pathinfo($docPath, PATHINFO_FILENAME).'-pdf';
+    return (new DocManipulationService())->convertDocToPdf($docPath, $fileName, 'doc-attachments');
+
+
+    $courierUser = CourierUser::find(13);
+    $user = User::find("9b723d98-b2b8-4d44-93ae-52d9e49345c4");
+    return Notification::send($user, new CourierDelivered($courierUser));
+    // $doc = Document::find(35);
+    // // notify demandeur and initiateur
+    // $initiateur = $doc->initiatorUser ?? $doc->externalInitiator;
+    // $demandeur = $doc->createdBy;
+    // Notification::send(collect([$initiateur, $demandeur]), new DocumentValidated($doc));
+
+    return;
+    return auth()->user()->needRenewPassword();
+
+    $user = User::find("9b71bd32-7d97-4a1d-b620-86000ae4c3df");
+    return $user->teams;
+
+    return asset(DocTemplate::find(1)->file_path);
+    // Increment the existing count
+    $newCount = 1;
+
+    // Generate a 6-digit courier number with leading zeroes
+    $courierNumber = str_pad($newCount, 6, '0', STR_PAD_LEFT);
+
+    return $courierNumber;
+
+    $courier = Courier::find(13);
+    $docPath = public_path("storage/{$courier->document->doc_path}");
+    $fileName = pathinfo($docPath, PATHINFO_FILENAME);
+    $courierNumber = "N°24CT000002";
+    return (new DocManipulationService())->addCourierNo($docPath, $fileName, "courier-attachments/$courier->id", $courierNumber);
+
+
+
+    // return phpinfo();
+    $docPath = public_path('storage/doc-attachments/3/contract-DOC-TEST-2-v01.pdf');
+    // $outputPath = public_path('storage/contract-DOC-TEST-ABZ-with-ref.docx');
+
+
+    // $templateProcessor = new TemplateProcessor($docPath);
+    // $templateProcessor->setValue('reference', $courierNumber);
+    // // Save the modified Word document
+    // $templateProcessor->saveAs($outputPath);
+    // return $outputPath;
+
+    // Create output directory if doesnt exist
+    $outputDirectory = "courier-tests";
+    if (!file_exists(public_path("storage/$outputDirectory"))) {
+        mkdir(public_path("storage/$outputDirectory"), 0777, true);
+    }
+
+    $fileName = pathinfo($docPath, PATHINFO_FILENAME);
+
+    // Add courier number to doc
+    return (new DocManipulationService())->addCourierNo($docPath, $fileName, $outputDirectory, $courierNumber);
+
+    return Courier::first()->coursers->first()->user;
+
+    return CustomRole::where('name', RoleEnum::COURSER->getLabel())?->first()?->id;
+    $document = Document::find(1);
+
+    $documentPath = public_path('storage/doc-templates/contract-template.docx');
+    // return phpinfo();
+    // return (new DocManipulationService())->removeImageBackground('paraphs/paraph-2.png');
+    // return (new DocManipulationService())->trackRevisions($documentPath);
+    // return (new DocManipulationService())->addSignature($documentPath, public_path('/storage/signatures/signature.png'));
+    // return (new DocManipulationService())->addParaphsToPdf();
+    // return (new DocManipulationService())->convertDocToPdf($documentPath);
+});
+
+
+Route::get('password-expired', PasswordExpired::class)->middleware(['auth', PasswordNotExpired::class])->name('password.expired');
+
+Route::get('get-document', [DocumentTemplateController::class, 'getDocument'])->middleware(['auth'])->name('document.get');
+
+Route::get('/download-doc', function () {
+    $file = public_path('storage/doc-attachments/contract-Orson-Copeland-v01.pdf');
+
+    return response()->download($file);
+})->name('download.contract');
